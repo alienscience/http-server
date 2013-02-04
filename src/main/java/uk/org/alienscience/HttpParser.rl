@@ -1,4 +1,8 @@
 
+package uk.org.alienscience;
+
+import java.io.UnsupportedEncodingException;
+
 class HttpParser {
 
     //------------ Start of generated code ------------------------------------
@@ -119,27 +123,24 @@ class HttpParser {
  
 
     HttpParser(byte data[], HttpRequest request) {
+        // TODO: consider buffer refills
         this.data = data;
         this.request = request;
         this.pe = data.length;
     }
 
+    private String extractString(int from, int to) throws UnsupportedEncodingException {
+        return new String(data, from, to - from, "ISO-8859-1");
+    }
 
     void start() {
         %%write init;
     }
 
-    // Extract a String from the data array using the given indices
-    String extractString(int from, int to) {
-        // TODO: implement    
-    }
-
     /**
      * Indicates if the parsing is complete, incomplete or has had an error
      */
-    ParseState parse() {
-        // TODO: initialise pe
-        int pe;   // Data end pointer - required by ragel
+    ParseState parse() throws UnsupportedEncodingException {
         int eof;  // EOF code         - required by ragel
         int ts;   // TODO: see if this is needed (section 6.3)
         int te;   // TODO: see if this is needed (section 6.3)
