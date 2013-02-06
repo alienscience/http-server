@@ -2,6 +2,7 @@
 package uk.org.alienscience;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 class HttpParser {
 
@@ -9,7 +10,7 @@ class HttpParser {
 %%{
     machine http_request;
     
-    alphtype byte;
+    alphtype int;
 
     # Actions to capture parts of the request line
     action method_is_get { 
@@ -32,8 +33,9 @@ class HttpParser {
         request.method = HttpRequest.Method.DELETE; 
     }
 
-    action method_is_unsupported { 
-        return ParseState.METHOD_IS_UNSUPPORTED;
+    action method_is_unsupported {
+        ret = ParseState.METHOD_IS_UNSUPPORTED;
+        fbreak;
     }
 
     get    = "GET"i    %method_is_get;
@@ -45,11 +47,11 @@ class HttpParser {
     method = get | put | post | head | delete  $!method_is_unsupported;
 
     action mark_path { 
-        markPath = p;
+        markStart = p;
     }
 
     action save_path { 
-        request.path = extractString(markPath,p);
+        request.path = saveString(data, p);
     }
 
     # URI, rfc2396
@@ -80,8 +82,8 @@ class HttpParser {
     request_line = method space uri space? http_version? crlf;
 
     # Actions to capture header fields 
-    action mark_host { markHost = p; }
-    action save_host { request.host = extractString(markHost, p); }
+    action mark_host { markStart = p; }
+    action save_host { request.host = saveString(data, p); }
 
     action mark_close { 
         request.keepalive = false;
@@ -109,28 +111,45 @@ class HttpParser {
 
     //------------ End of generated code --------------------------------------
 
-    private final byte data[];
     private final HttpRequest request;
 
     // Member variables required by Ragel
     private int cs;   // Current state
-    private int p;    // Data pointer
-    private int pe;   // Pointer to end of data
 
-    // Indices used to mark the start of interesting byte ranges
-    private int markHost;
-    private int markPath;
- 
+    // Index used to mark the start of interesting byte ranges. A value of -1 indicates no mark
+    // has been set
+    private int markStart;
 
-    HttpParser(byte data[], HttpRequest request) {
-        // TODO: consider buffer refills
-        this.data = data;
+    // Partially built marked strings
+    StringBuilder markedString;
+
+    HttpParser(HttpRequest request) {
         this.request = request;
-        this.pe = data.length;
+        this.markStart = -1;
+        this.markedString = new StringBuilder();
     }
 
-    private String extractString(int from, int to) throws UnsupportedEncodingException {
-        return new String(data, from, to - from, "ISO-8859-1");
+    // Extract a string starting at markStart
+    private String extractString(byte[] data, int to) throws UnsupportedEncodingException {
+        if (markStart == -1) return "";
+        return new String(data, markStart, to - markStart, "ISO-8859-1");
+    }
+
+    // Save a marked string for the next round of parsing
+    private void saveMark(byte[] data, int to) throws UnsupportedEncodingException {
+        if (markStart >= 0) {
+            markedString.append(extractString(data, to));
+            markStart = 0;
+        }
+    }
+
+    // Save a marked string for external use
+    private String saveString(byte[] data, int to) throws UnsupportedEncodingException {
+        markedString.append(extractString(data, to));
+        String ret = markedString.toString();
+        markedString.delete(0, markedString.length());
+        markStart = -1;
+        return ret;
     }
 
     void start() {
@@ -138,14 +157,28 @@ class HttpParser {
     }
 
     /**
-     * Indicates if the parsing is complete, incomplete or has had an error
+     * Parses a HTTP header
+     * @param buffer The buffer to read from. This should be in a state that is ready for reading. The buffer will
+     *        be left in a state where it can be written to.
+     * @return Indicates if the parsing is complete, incomplete or has had an error.
      */
-    ParseState parse() throws UnsupportedEncodingException {
-        int eof;  // EOF code         - required by ragel
-        int ts;   // TODO: see if this is needed (section 6.3)
-        int te;   // TODO: see if this is needed (section 6.3)
+    ParseState parse(ByteBuffer buffer) throws UnsupportedEncodingException {
 
+        ParseState ret = ParseState.INCOMPLETE;
+
+        int eof = -1;     // EOF code - required by Ragel
         int path_start;   // The start of the path in the URI
+
+        // Initialise the current position for the Ragel parser
+        int offset = buffer.arrayOffset();
+        int p = buffer.position() + offset;
+        assert(p == offset);
+
+        // The end of the data in the buffer
+        int pe = buffer.limit() + offset;
+
+        // The block of data to parse
+        final byte[] data = buffer.array();
 
         //--- Start of generated code ---
         
@@ -156,7 +189,11 @@ class HttpParser {
         }
 
         if (cs < %%{ write first_final; }%% ) {
-            return ParseState.INCOMPLETE;
+            // Get the buffer ready for writing
+            saveMark(data, p);
+            buffer.position(p);
+            buffer.compact();
+            return ret;
         }
 
         return ParseState.COMPLETE;
