@@ -63,7 +63,7 @@ class HttpParser {
     reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | "," ;
     escaped = "%" xdigit xdigit ;
     pchar = ( unreserved | escaped | ":" | "@" | "&" | "=" | "+" | "$" | "," ) ;
-    abs_path = ( "/" pchar ( pchar | "/")* ) >mark_path %save_path;
+    abs_path = ( "/" ( pchar | "/")* ) >mark_path %save_path;
     uric = reserved | unreserved | escaped ;
     query = uric* ;
     abs_uri = "http://" hostport abs_path ("?" query )? ;
@@ -127,6 +127,7 @@ class HttpParser {
         this.request = request;
         this.markStart = -1;
         this.markedString = new StringBuilder();
+        start();
     }
 
     // Extract a string starting at markStart
@@ -167,7 +168,6 @@ class HttpParser {
         ParseState ret = ParseState.INCOMPLETE;
 
         int eof = -1;     // EOF code - required by Ragel
-        int path_start;   // The start of the path in the URI
 
         // Initialise the current position for the Ragel parser
         int offset = buffer.arrayOffset();
@@ -185,6 +185,7 @@ class HttpParser {
         %%write exec;
 
         if (cs == %%{ write error; }%% ) {
+            System.err.println("Failed to parse p=" + p);
             return ParseState.ERROR;
         }
 
