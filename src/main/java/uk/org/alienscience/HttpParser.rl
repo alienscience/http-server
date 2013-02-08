@@ -111,7 +111,7 @@ class HttpParser {
 
     //------------ End of generated code --------------------------------------
 
-    private final HttpRequest request;
+    private HttpRequest request;
 
     // Member variables required by Ragel
     private int cs;   // Current state
@@ -123,11 +123,16 @@ class HttpParser {
     // Partially built marked strings
     StringBuilder markedString;
 
-    HttpParser(HttpRequest request) {
+    /**
+     * Reset the parser and associate it with the given HttpRequest
+     */
+    public void reset(HttpRequest request) {
         this.request = request;
         this.markStart = -1;
         this.markedString = new StringBuilder();
-        start();
+
+        // --- Generated code ---
+        %%write init;
     }
 
     // Extract a string starting at markStart
@@ -151,10 +156,6 @@ class HttpParser {
         markedString.delete(0, markedString.length());
         markStart = -1;
         return ret;
-    }
-
-    void start() {
-        %%write init;
     }
 
     /**

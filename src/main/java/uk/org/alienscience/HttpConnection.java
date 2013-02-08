@@ -2,9 +2,7 @@ package uk.org.alienscience;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -12,72 +10,74 @@ import java.nio.charset.CharsetEncoder;
  * A runnable object that handles a single HttpConnection
  */
 public class HttpConnection implements Runnable {
+    // TODO: make the buffer size configurable
+    private static final int BUFFER_SIZE_BYTES = 16384;
     private static final Charset charset = Charset.forName("UTF-8");
 
     private final SocketChannel channel;
     private final HttpRoutes routes;
+    private final CharsetEncoder encoder;
 
     public HttpConnection(SocketChannel channel, HttpRoutes routes) {
         this.channel = channel;
         this.routes = routes;
+        this.encoder = charset.newEncoder();
     }
 
     @Override
     public void run() {
-        HttpRequest request = parseHeader();
+        HttpParser parser = new HttpParser();
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
 
-        // TODO: Route lookup
-        // TODO: If blocking, setup request/response and call handler
-        // TODO: If non-blocking, send to non-blocking thread
-
-
-        // TODO: move this into HttpResponse
-        CharsetEncoder encoder = charset.newEncoder();
+        HttpRequest request = new HttpRequest();
+        HttpResponse response = new HttpResponse(channel, encoder);
 
         try {
-            System.out.println("Got connection");
-            channel.write(encoder.encode(CharBuffer.wrap(request.path)));
-            System.out.println("Wrote buffer");
-        } catch (CharacterCodingException e) {
-            System.err.println("CharacterCodingException:" + e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
+            do {
+                // TODO: use slf4j
+                System.out.println("Got connection");
+                parser.reset(request);
+                parseHeader(parser, buffer);
+                callHandler(request, response);
+            } while (request.keepalive);
         } finally {
             try {
                 channel.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // Ignored
             }
         }
     }
 
     // Parse a HTTP header
-    private HttpRequest parseHeader() {
-        HttpRequest request = new HttpRequest();
-        HttpParser parser = new HttpParser(request);
-        ByteBuffer buffer = ByteBuffer.allocate(4096);
+    // Returns true on success, false otherwise
+    private boolean parseHeader(HttpParser parser, ByteBuffer buffer) {
         buffer.clear();
 
         try {
             while (channel.read(buffer) != -1) {
-                bufferStats(buffer);
                 buffer.flip();
                 ParseState state = parser.parse(buffer);
-                System.out.println(state);
                 if (state != ParseState.INCOMPLETE) {
                     break;
                 }
-                bufferStats(buffer);
             }
-            return request;
+            return true;
         } catch (Exception e) {
-            return null;
+            return false;
+        }
+    }
+
+    // Call a HttpHandler to handle the given request
+    private void callHandler(HttpRequest request, HttpResponse response) {
+        RouteLookup route = routes.lookup(request);
+        if (!route.isAvailable()) {
+            response.sendError(HttpResponse.SC_NOT_FOUND);
+            return;
         }
 
+        route.handle(request, response);
     }
 
-    // Temporary method
-    private void bufferStats(ByteBuffer buffer) {
-        System.out.println(buffer.position() + ", " + buffer.limit());
-    }
+
 }

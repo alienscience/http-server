@@ -30,7 +30,8 @@ public class HttpParserTest {
     // Test the given data parses correctly and has the given path
     public void assertPath(byte[] data, String path) throws UnsupportedEncodingException {
         HttpRequest request = new HttpRequest();
-        HttpParser parser = new HttpParser(request);
+        HttpParser parser = new HttpParser();
+        parser.reset(request);
         assertSuccessfulParse(parser, data);
         assertEquals(path, request.path);
     }
@@ -40,7 +41,8 @@ public class HttpParserTest {
         throws UnsupportedEncodingException {
         int numBlocks = (int) Math.ceil(wholeData.length / (double) bufferSize);
         HttpRequest request = new HttpRequest();
-        HttpParser parser = new HttpParser(request);
+        HttpParser parser = new HttpParser();
+        parser.reset(request);
 
         // Loop through the incomplete parses
         for (int i = 0; i < numBlocks - 1; i++) {
@@ -70,7 +72,7 @@ public class HttpParserTest {
     }
 
 
-    // Test that HTTP headers spread across multiple buffers writes can be parsed
+    // Test that HTTP headers spread across multiple buffer writes can be parsed
     @Test
     public void testMultipleBuffer() throws UnsupportedEncodingException {
        assertSuccessfulParseInChunks(

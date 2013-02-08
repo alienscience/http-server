@@ -1,7 +1,7 @@
 package uk.org.alienscience;
 
 /**
- * TODO: Document
+ * Information obtained from HTTP headers
  */
 public class HttpRequest {
 	enum Method {

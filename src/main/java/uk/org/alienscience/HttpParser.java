@@ -402,7 +402,7 @@ static final int http_request_en_http_request = 1;
 
     //------------ End of generated code --------------------------------------
 
-    private final HttpRequest request;
+    private HttpRequest request;
 
     // Member variables required by Ragel
     private int cs;   // Current state
@@ -414,11 +414,22 @@ static final int http_request_en_http_request = 1;
     // Partially built marked strings
     StringBuilder markedString;
 
-    HttpParser(HttpRequest request) {
+    /**
+     * Reset the parser and associate it with the given HttpRequest
+     */
+    public void reset(HttpRequest request) {
         this.request = request;
         this.markStart = -1;
         this.markedString = new StringBuilder();
-        start();
+
+        // --- Generated code ---
+        
+// line 428 "HttpParser.java"
+	{
+	cs = http_request_start;
+	}
+
+// line 136 "HttpParser.rl"
     }
 
     // Extract a string starting at markStart
@@ -442,16 +453,6 @@ static final int http_request_en_http_request = 1;
         markedString.delete(0, markedString.length());
         markStart = -1;
         return ret;
-    }
-
-    void start() {
-        
-// line 450 "HttpParser.java"
-	{
-	cs = http_request_start;
-	}
-
-// line 158 "HttpParser.rl"
     }
 
     /**
@@ -480,7 +481,7 @@ static final int http_request_en_http_request = 1;
         //--- Start of generated code ---
         
         
-// line 484 "HttpParser.java"
+// line 485 "HttpParser.java"
 	{
 	int _klen;
 	int _trans = 0;
@@ -641,7 +642,7 @@ case 1:
         request.keepalive = true;
     }
 	break;
-// line 645 "HttpParser.java"
+// line 646 "HttpParser.java"
 			}
 		}
 	}
@@ -669,7 +670,7 @@ case 4:
         { p += 1; _goto_targ = 5; if (true)  continue _goto;}
     }
 	break;
-// line 673 "HttpParser.java"
+// line 674 "HttpParser.java"
 		}
 	}
 	}
@@ -679,21 +680,21 @@ case 5:
 	break; }
 	}
 
-// line 186 "HttpParser.rl"
+// line 187 "HttpParser.rl"
 
         if (cs == 
-// line 686 "HttpParser.java"
+// line 687 "HttpParser.java"
 0
-// line 187 "HttpParser.rl"
+// line 188 "HttpParser.rl"
  ) {
             System.err.println("Failed to parse p=" + p);
             return ParseState.ERROR;
         }
 
         if (cs < 
-// line 695 "HttpParser.java"
+// line 696 "HttpParser.java"
 168
-// line 192 "HttpParser.rl"
+// line 193 "HttpParser.rl"
  ) {
             // Get the buffer ready for writing
             saveMark(data, p);
