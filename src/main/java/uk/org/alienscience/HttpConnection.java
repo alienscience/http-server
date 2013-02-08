@@ -36,9 +36,7 @@ public class HttpConnection implements Runnable {
 
         try {
             System.out.println("Got connection");
-            for (int i = 0; i < 10; i++) {
-                channel.write(encoder.encode(CharBuffer.wrap(request.path)));
-            }
+            channel.write(encoder.encode(CharBuffer.wrap(request.path)));
             System.out.println("Wrote buffer");
         } catch (CharacterCodingException e) {
             System.err.println("CharacterCodingException:" + e.getMessage());
