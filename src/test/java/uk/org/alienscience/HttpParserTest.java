@@ -33,7 +33,7 @@ public class HttpParserTest {
         HttpParser parser = new HttpParser();
         parser.reset(request);
         assertSuccessfulParse(parser, data);
-        assertEquals(path, request.path);
+        assertEquals(path, request.getPath());
     }
 
     // Parse data in chunks
@@ -53,7 +53,6 @@ public class HttpParserTest {
 
         // The final call to the parser should be complete
         int start = bufferSize * (numBlocks - 1);
-        int end = wholeData.length - ((numBlocks - 1) * bufferSize);
         byte[] buffer = Arrays.copyOfRange(wholeData, start, wholeData.length );
         assertSuccessfulParse(parser, buffer);
     }

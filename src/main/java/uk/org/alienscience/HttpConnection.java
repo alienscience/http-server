@@ -39,7 +39,7 @@ public class HttpConnection implements Runnable {
                 parser.reset(request);
                 parseHeader(parser, buffer);
                 callHandler(request, response);
-            } while (request.keepalive);
+            } while (request.isKeepAlive());
         } finally {
             try {
                 channel.close();

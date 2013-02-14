@@ -13,24 +13,24 @@ class HttpParser {
     alphtype int;
 
     # Actions to capture parts of the request line
-    action method_is_get { 
-        request.method = HttpRequest.Method.GET; 
+    action method_is_get {
+        request.setMethod(HttpRequest.Method.GET);
     }
 
     action method_is_put { 
-        request.method = HttpRequest.Method.PUT; 
+        request.setMethod(HttpRequest.Method.PUT);
     }
 
     action method_is_post { 
-        request.method = HttpRequest.Method.POST; 
+        request.setMethod(HttpRequest.Method.POST);
     }
 
     action method_is_head { 
-        request.method = HttpRequest.Method.HEAD; 
+        request.setMethod(HttpRequest.Method.HEAD);
     }
 
     action method_is_delete { 
-        request.method = HttpRequest.Method.DELETE; 
+        request.setMethod(HttpRequest.Method.DELETE);
     }
 
     action method_is_unsupported {
@@ -51,7 +51,7 @@ class HttpParser {
     }
 
     action save_path { 
-        request.path = saveString(data, p);
+        request.setPath(saveString(data, p));
     }
 
     # URI, rfc2396
@@ -73,24 +73,24 @@ class HttpParser {
     # Allow use of netcat by using \n as a delimiter
     crlf = ( "\n" | "\r\n" );
     http_1_0 = "HTTP/1.0" %{ 
-        request.httpVersion = HttpRequest.Version.HTTP_1_0; 
+        request.setHttpVersion(HttpRequest.Version.HTTP_1_0);
     };
     http_1_1 = "HTTP/1.1" %{ 
-         request.httpVersion = HttpRequest.Version.HTTP_1_1; 
+        request.setHttpVersion(HttpRequest.Version.HTTP_1_1);
     };
     http_version = ( http_1_0 | http_1_1 );
     request_line = method space uri space? http_version? crlf;
 
     # Actions to capture header fields 
     action mark_host { markStart = p; }
-    action save_host { request.host = saveString(data, p); }
+    action save_host { request.setHost(saveString(data, p)); }
 
-    action mark_close { 
-        request.keepalive = false;
+    action mark_close {
+        request.setKeepAlive(false);
     }
 
     action mark_keepalive {
-        request.keepalive = true;
+        request.setKeepAlive(true);
     }
 
     # Request header fields, section 5.3 

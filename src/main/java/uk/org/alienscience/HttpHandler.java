@@ -1,7 +1,7 @@
 package uk.org.alienscience;
 
 /**
- * TODO: Document
+ * A class that is overriden to handle HTTP requests
  */
 public abstract class HttpHandler {
 

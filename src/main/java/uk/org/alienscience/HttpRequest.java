@@ -7,13 +7,51 @@ public class HttpRequest {
 	enum Method {
 		GET, PUT, POST, HEAD, DELETE;
 	}
-	enum Version {
-		HTTP_1_0, HTTP_1_1;
-	}
-	
-	Version httpVersion;
-	boolean keepalive;
-	Method method;
-	String host;
-	String path;
+
+    private HttpVersion httpVersion;
+	private boolean keepAlive;
+	private Method method;
+	private String host;
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public HttpVersion getHttpVersion() {
+        return httpVersion;
+    }
+
+    public void setHttpVersion(HttpVersion httpVersion) {
+        this.httpVersion = httpVersion;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
 }

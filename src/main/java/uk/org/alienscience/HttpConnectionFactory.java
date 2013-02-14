@@ -3,7 +3,7 @@ package uk.org.alienscience;
 import java.nio.channels.SocketChannel;
 
 /**
- * TODO: Document
+ * Creates new connection objects when a new connection is made
  */
 public class HttpConnectionFactory implements TcpConnectionFactory {
     private final HttpRoutes routes;

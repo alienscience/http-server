@@ -563,32 +563,32 @@ case 1:
 			{
 	case 0:
 // line 16 "HttpParser.rl"
-	{ 
-        request.method = HttpRequest.Method.GET; 
+	{
+        request.setMethod(HttpRequest.Method.GET);
     }
 	break;
 	case 1:
 // line 20 "HttpParser.rl"
 	{ 
-        request.method = HttpRequest.Method.PUT; 
+        request.setMethod(HttpRequest.Method.PUT);
     }
 	break;
 	case 2:
 // line 24 "HttpParser.rl"
 	{ 
-        request.method = HttpRequest.Method.POST; 
+        request.setMethod(HttpRequest.Method.POST);
     }
 	break;
 	case 3:
 // line 28 "HttpParser.rl"
 	{ 
-        request.method = HttpRequest.Method.HEAD; 
+        request.setMethod(HttpRequest.Method.HEAD);
     }
 	break;
 	case 4:
 // line 32 "HttpParser.rl"
 	{ 
-        request.method = HttpRequest.Method.DELETE; 
+        request.setMethod(HttpRequest.Method.DELETE);
     }
 	break;
 	case 5:
@@ -607,19 +607,19 @@ case 1:
 	case 7:
 // line 53 "HttpParser.rl"
 	{ 
-        request.path = saveString(data, p);
+        request.setPath(saveString(data, p));
     }
 	break;
 	case 8:
 // line 75 "HttpParser.rl"
 	{ 
-        request.httpVersion = HttpRequest.Version.HTTP_1_0; 
+        request.setHttpVersion(HttpVersion.Version.HTTP_1_0);
     }
 	break;
 	case 9:
 // line 78 "HttpParser.rl"
 	{ 
-         request.httpVersion = HttpRequest.Version.HTTP_1_1; 
+        request.setHttpVersion(HttpVersion.Version.HTTP_1_1);
     }
 	break;
 	case 10:
@@ -628,18 +628,18 @@ case 1:
 	break;
 	case 11:
 // line 86 "HttpParser.rl"
-	{ request.host = saveString(data, p); }
+	{ request.setHost(saveString(data, p)); }
 	break;
 	case 12:
 // line 88 "HttpParser.rl"
-	{ 
-        request.keepalive = false;
+	{
+        request.setKeepAlive(false);
     }
 	break;
 	case 13:
 // line 92 "HttpParser.rl"
 	{
-        request.keepalive = true;
+        request.setKeepAlive(true);
     }
 	break;
 // line 646 "HttpParser.java"

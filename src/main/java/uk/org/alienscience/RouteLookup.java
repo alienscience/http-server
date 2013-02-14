@@ -33,7 +33,7 @@ public class RouteLookup {
         // TODO: If blocking, setup request/response and call handler
         // TODO: If non-blocking, send to non-blocking thread
 
-        switch (request.method) {
+        switch (request.getMethod()) {
             case GET:
                 handler.doGet(request,response);
                 break;
