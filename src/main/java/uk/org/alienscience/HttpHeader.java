@@ -1,7 +1,6 @@
 package uk.org.alienscience;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -14,13 +13,11 @@ class HttpHeader {
     static final byte[] CONTENT_TYPE = convertToBytes("Content-Type: ");
     static final byte[] CONTENT_LENGTH = convertToBytes("Content-Length: ");
 
-    private final SocketChannel channel;
-    private final ByteBuffer buffer;
+    private final BufferedChannel channel;
     private final Charset charset;
 
-    HttpHeader(SocketChannel channel, ByteBuffer buffer) {
+    HttpHeader(BufferedChannel channel) {
         this.channel = channel;
-        this.buffer = buffer;
         charset = Charset.forName("ISO-8859-1");
     }
 
@@ -35,22 +32,17 @@ class HttpHeader {
         return s.getBytes(charset);
     }
 
-    // Put a header into the given byte buffer
-    // TODO: output on buffer overflow
+    // Put a header into the buffered channel
     void put(HttpVersion httpVersion,
              HttpStatus httpStatus,
-             String contentType,
-             int contentLength ) {
-        byte[] version = convertToBytes(httpVersion.toString(), charset);
-        byte[] statusCode = convertToBytes(String.valueOf(httpStatus.code), charset);
-        byte[] statusMessage = convertToBytes(httpStatus.toString(), charset);
-        byte[] contentTypeBytes = convertToBytes(contentType, charset);
+             byte[] contentType,
+             int contentLength ) throws IOException {
         byte[] contentLengthBytes = convertToBytes(String.valueOf(contentLength), charset);
-        buffer.put(version).put(SPACE);
-        buffer.put(statusCode).put(SPACE);
-        buffer.put(statusMessage).put(CRNL);
-        buffer.put(CONTENT_TYPE).put(contentTypeBytes).put(CRNL);
-        buffer.put(CONTENT_LENGTH).put(contentLengthBytes).put(CRNL);
-        buffer.put(CRNL);
+        channel.put(httpVersion.toBytes()).put(SPACE);
+        channel.put(httpStatus.code).put(SPACE);
+        channel.put(httpStatus.message).put(CRNL);
+        channel.put(CONTENT_TYPE).put(contentType).put(CRNL);
+        channel.put(CONTENT_LENGTH).put(contentLengthBytes).put(CRNL);
+        channel.put(CRNL);
     }
 }

@@ -28,9 +28,10 @@ public class HttpConnection implements Runnable {
     public void run() {
         HttpParser parser = new HttpParser();
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        BufferedChannel bufferedChannel = new BufferedChannel(channel, buffer);
 
         HttpRequest request = new HttpRequest();
-        HttpResponse response = new HttpResponse(channel, encoder);
+        HttpResponse response = new HttpResponse(bufferedChannel);
 
         try {
             do {
@@ -39,7 +40,10 @@ public class HttpConnection implements Runnable {
                 parser.reset(request);
                 parseHeader(parser, buffer);
                 callHandler(request, response);
+                bufferedChannel.flush();
             } while (request.isKeepAlive());
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             try {
                 channel.close();
@@ -69,10 +73,10 @@ public class HttpConnection implements Runnable {
     }
 
     // Call a HttpHandler to handle the given request
-    private void callHandler(HttpRequest request, HttpResponse response) {
+    private void callHandler(HttpRequest request, HttpResponse response) throws IOException {
         RouteLookup route = routes.lookup(request);
         if (!route.isAvailable()) {
-            response.sendError(HttpResponse.SC_NOT_FOUND);
+            response.sendError(HttpStatus.NOT_FOUND);
             return;
         }
 

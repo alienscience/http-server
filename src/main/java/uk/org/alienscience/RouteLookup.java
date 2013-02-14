@@ -1,5 +1,7 @@
 package uk.org.alienscience;
 
+import java.io.IOException;
+
 /**
  * The result of looking up a route
  */
@@ -29,7 +31,7 @@ public class RouteLookup {
      * @param request Http request header information
      * @param response The response to send back to the caller
      */
-    public void handle(HttpRequest request, HttpResponse response) {
+    public void handle(HttpRequest request, HttpResponse response) throws IOException {
         // TODO: If blocking, setup request/response and call handler
         // TODO: If non-blocking, send to non-blocking thread
 
@@ -50,7 +52,7 @@ public class RouteLookup {
                 handler.doDelete(request,response);
                 break;
             default:
-                response.sendError(HttpResponse.SC_METHOD_NOT_ALLOWED);
+                response.sendError(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
 

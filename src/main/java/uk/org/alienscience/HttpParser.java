@@ -613,13 +613,13 @@ case 1:
 	case 8:
 // line 75 "HttpParser.rl"
 	{ 
-        request.setHttpVersion(HttpVersion.Version.HTTP_1_0);
+        request.setHttpVersion(HttpVersion.HTTP_1_0);
     }
 	break;
 	case 9:
 // line 78 "HttpParser.rl"
 	{ 
-        request.setHttpVersion(HttpVersion.Version.HTTP_1_1);
+        request.setHttpVersion(HttpVersion.HTTP_1_1);
     }
 	break;
 	case 10:

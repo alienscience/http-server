@@ -11,7 +11,7 @@ public class App {
         HttpServer server = new HttpServer();
         server.route("/hello", new HttpHandler() {
             @Override
-            public void doGet(HttpRequest request, HttpResponse response) {
+            public void doGet(HttpRequest request, HttpResponse response) throws IOException {
                 response.write("Hello world");
             }
         });

@@ -9,20 +9,13 @@ public enum HttpStatus {
     NOT_FOUND(404, "NOT FOUND"),
     METHOD_NOT_ALLOWED(405, "METHOD NOT ALLOWED");
 
-    public final int code;
-    public final String message;
+    public final byte[] code;
+    public final byte[] message;
 
     HttpStatus(int code, String message) {
-        this.code = code;
-        this.message = message;
+        Charset charset = Charset.forName("ISO-8859-1");
+        this.code = String.valueOf(code).getBytes(charset);
+        this.message = message.getBytes(charset);
     }
 
-    @Override
-    public String toString() {
-        return message;
-    }
-
-    public byte[] toBytes(Charset charset) {
-        return String.valueOf(code).getBytes(charset);
-    }
 }

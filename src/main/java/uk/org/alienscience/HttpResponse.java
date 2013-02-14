@@ -1,8 +1,7 @@
 package uk.org.alienscience;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * An implementation of a HttpResponse
@@ -10,23 +9,22 @@ import java.nio.channels.SocketChannel;
  */
 public class HttpResponse {
 
-
-    private final SocketChannel channel;
+    private final BufferedChannel channel;
     private final HttpHeader httpHeader;
+    private final Charset charset;
 
     // Mutable variables so that the response can be reused
     private HttpVersion httpVersion;
     private int contentLength;
-    private String contentType;
+    private byte[] contentType;
     private HttpStatus status;
+    boolean haveWrittenHeader;
 
-    // The response is built into a bytebuffer
-    ByteBuffer outputBuffer;
-
-    public HttpResponse(SocketChannel channel, int bufferSize) {
+    public HttpResponse(BufferedChannel channel) {
         this.channel = channel;
-        this.outputBuffer = ByteBuffer.allocate(bufferSize);
-        this.httpHeader = new HttpHeader(channel, outputBuffer);
+        this.httpHeader = new HttpHeader(channel);
+        this.charset = Charset.forName("UTF-8");
+        this.haveWrittenHeader = false;
     }
 
     /**
@@ -38,37 +36,38 @@ public class HttpResponse {
     }
 
     /**
-     * TODO: implement this for both HTTP 1.0 and HTTP 1.1
-     * TODO: use static strings in format call
-     * TODO: connect status codes with messages
+     * Send a HTTP error to the client
      * @param status The HTTP status code to return to the client
      */
-    public void sendError(HttpStatus status) {
-        String message = status.message;
-        int contentLength = message.length();
-        StringBuffer response = new StringBuffer(httpVersion.toString());
-
-        response.append(" ").append(status.code).append(" ").append(message).append("\r\n")
-                .append("Content-Type: text/plain\r\n" )
-                .append("Content-Length: ").append(contentLength).append("\r\n");
-        write(response.toString());
+    public void sendError(HttpStatus status) throws IOException {
+        byte[] message = status.message;
+        setContentLength(message.length);
+        setStatus(status);
+        setContentType(ContentType.TEXT);
+        write(message);
     }
 
-    private void writeWithHeader(String s) {
-        httpHeader.put(httpVersion, status, contentType, contentLength);
-        // TODO: set encoding
-        ByteBuffer body = bodyEncoder.encode(CharBuffer.wrap(s));
-        outputBuffer.put(body);
-        // TODO: see if this has to be looped
-        outputBuffer.flip();
-        channel.write(outputBuffer);
+    public void write(byte[] data) throws IOException {
+        if (!haveWrittenHeader) {
+            httpHeader.put(httpVersion, status, contentType, contentLength);
+            haveWrittenHeader = true;
+        }
+        channel.put(data);
+    }
+
+    public void write(String s) throws IOException {
+        write(s.getBytes(charset));
+    }
+
+    public void setStatus(HttpStatus status) {
+        this.status = status;
     }
 
     public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType.toBytes();
     }
 }

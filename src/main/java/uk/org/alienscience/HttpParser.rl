@@ -73,10 +73,10 @@ class HttpParser {
     # Allow use of netcat by using \n as a delimiter
     crlf = ( "\n" | "\r\n" );
     http_1_0 = "HTTP/1.0" %{ 
-        request.setHttpVersion(HttpRequest.Version.HTTP_1_0);
+        request.setHttpVersion(HttpVersion.HTTP_1_0);
     };
     http_1_1 = "HTTP/1.1" %{ 
-        request.setHttpVersion(HttpRequest.Version.HTTP_1_1);
+        request.setHttpVersion(HttpVersion.HTTP_1_1);
     };
     http_version = ( http_1_0 | http_1_1 );
     request_line = method space uri space? http_version? crlf;
