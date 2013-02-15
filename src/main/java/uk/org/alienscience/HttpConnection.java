@@ -4,24 +4,21 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 
 /**
  * A runnable object that handles a single HttpConnection
  */
 public class HttpConnection implements Runnable {
     // TODO: make the buffer size configurable
+	// TODO: use same buffer for input and output
     private static final int BUFFER_SIZE_BYTES = 16384;
-    private static final Charset charset = Charset.forName("UTF-8");
 
     private final SocketChannel channel;
     private final HttpRoutes routes;
-    private final CharsetEncoder encoder;
 
     public HttpConnection(SocketChannel channel, HttpRoutes routes) {
         this.channel = channel;
         this.routes = routes;
-        this.encoder = charset.newEncoder();
     }
 
     @Override
@@ -37,12 +34,22 @@ public class HttpConnection implements Runnable {
             do {
                 // TODO: use slf4j
                 System.out.println("Got connection");
+                
+                // Parse the request
                 parser.reset(request);
                 parseHeader(parser, buffer);
+               
+                // Initialise the response
+                response.reuse();
+                response.setHttpVersion(request.getHttpVersion());
+                
+                // Call the handler
                 callHandler(request, response);
                 bufferedChannel.flush();
             } while (request.isKeepAlive());
         } catch (IOException e) {
+        	System.out.println(e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {

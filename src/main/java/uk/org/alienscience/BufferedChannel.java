@@ -32,7 +32,7 @@ public class BufferedChannel {
             buffer.put(data, 0, remaining);
             buffer.flip();
             channel.write(buffer);
-            buffer.reset();
+            buffer.clear();
             buffer.put(data, remaining, data.length - remaining);
         }
         return this;
@@ -41,6 +41,6 @@ public class BufferedChannel {
     public void flush() throws IOException {
         buffer.flip();
         channel.write(buffer);
-        buffer.reset();
+        buffer.clear();
     }
 }

@@ -1,6 +1,6 @@
 package uk.org.alienscience;
 
-import uk.org.alienscience.routes.BinaryTree;
+import uk.org.alienscience.routes.Stub;
 import uk.org.alienscience.threadpool.ThreadPool;
 
 import java.io.IOException;
@@ -47,7 +47,8 @@ public class HttpServer {
      */
     public HttpServer(Parameters parameters) {
         // TODO: create non-blocking executor and pass to HttpConnectionFactory
-        this.routes = new BinaryTree();
+    	// TODO: dependency injection
+        this.routes = new Stub();
         this.server = new TcpServer(
                 parameters.port,
                 new HttpConnectionFactory(routes),

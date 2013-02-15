@@ -7,7 +7,8 @@ import java.nio.charset.Charset;
  */
 public enum HttpStatus {
     NOT_FOUND(404, "NOT FOUND"),
-    METHOD_NOT_ALLOWED(405, "METHOD NOT ALLOWED");
+    METHOD_NOT_ALLOWED(405, "METHOD NOT ALLOWED"), 
+    OK(200,"OK");
 
     public final byte[] code;
     public final byte[] message;

@@ -7,7 +7,9 @@ import uk.org.alienscience.*;
  */
 public class Stub implements HttpRoutes {
     private HttpHandler httpHandler;
-    private SocketEventHandler socketEventHandler;
+    
+    // TODO: non-blocking handlers
+	private SocketEventHandler socketEventHandler;
 
     @Override
     public void add(String url, HttpHandler handler) {

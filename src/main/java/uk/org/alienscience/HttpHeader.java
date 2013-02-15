@@ -37,6 +37,7 @@ class HttpHeader {
              HttpStatus httpStatus,
              byte[] contentType,
              int contentLength ) throws IOException {
+    	// TODO: output chunked if content length == -1
         byte[] contentLengthBytes = convertToBytes(String.valueOf(contentLength), charset);
         channel.put(httpVersion.toBytes()).put(SPACE);
         channel.put(httpStatus.code).put(SPACE);

@@ -12,7 +12,7 @@ public class App {
         server.route("/hello", new HttpHandler() {
             @Override
             public void doGet(HttpRequest request, HttpResponse response) throws IOException {
-                response.write("Hello world");
+                response.body("Hello world");
             }
         });
         server.start();

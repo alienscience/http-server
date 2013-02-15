@@ -24,9 +24,16 @@ public class HttpResponse {
         this.channel = channel;
         this.httpHeader = new HttpHeader(channel);
         this.charset = Charset.forName("UTF-8");
-        this.haveWrittenHeader = false;
     }
 
+    // Called to reuse the response
+    void reuse() {
+    	status = HttpStatus.OK;
+    	contentType = ContentType.HTML.toBytes();
+    	contentLength = -1;
+        haveWrittenHeader = false;
+    }
+    
     /**
      * Set the HTTP version of the response
      * @param version The HTTP version of the response
@@ -55,7 +62,7 @@ public class HttpResponse {
         channel.put(data);
     }
 
-    public void write(String s) throws IOException {
+    public void body(String s) throws IOException {
         write(s.getBytes(charset));
     }
 
