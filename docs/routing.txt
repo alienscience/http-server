@@ -1,0 +1,22 @@
+
+/single           - route to single handler
+/path/*           - all routes under /path/*
+/path/subpath/*   - more specific than /path/* so matches
+/path/*.txt       - more specific than /path/* so matches
+/path/{name}/*    - With jersey style capturing, more specific 
+                    than /path/* but less specific than /path/subpath/*
+/path/{name}/woot - More specific than /path/{name}/*
+
+           branches containing nodes
+
+   root -- single
+        `- path ---- subpath -- *
+                `--- *.txt
+                `--- {name} -- woot
+                            `- * 
+
+Algorithm:
+  - Split path on /
+  - Check specific path (use hash table)
+  - Check file patterns (order not specified)
+  - Check captured 

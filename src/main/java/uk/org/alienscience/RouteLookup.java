@@ -13,16 +13,22 @@ public class RouteLookup {
     /**
      * Create an unavailable route
      */
-    public RouteLookup() {
-        isAvailable = false;
-        handler = null;
+    public static RouteLookup notFound() {
+        return new RouteLookup(false, null);
     }
-
+   
     /**
      * Create an available route
      */
-    public RouteLookup(HttpHandler handler) {
-        this.isAvailable = true;
+    public static RouteLookup found(HttpHandler handler) {
+        return new RouteLookup(true, handler);
+    }
+    
+    /**
+     * Create a route lookup
+     */
+    private RouteLookup(boolean isAvailable, HttpHandler handler) {
+        this.isAvailable = isAvailable;
         this.handler = handler;
     }
 

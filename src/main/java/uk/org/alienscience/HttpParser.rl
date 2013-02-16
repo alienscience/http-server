@@ -3,6 +3,7 @@ package uk.org.alienscience;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 class HttpParser {
 
@@ -51,7 +52,7 @@ class HttpParser {
     }
 
     action save_path { 
-        request.setPath(saveString(data, p));
+        request.setPath(saveBytes(data, p));
     }
 
     # URI, rfc2396
@@ -83,7 +84,7 @@ class HttpParser {
 
     # Actions to capture header fields 
     action mark_host { markStart = p; }
-    action save_host { request.setHost(saveString(data, p)); }
+    action save_host { request.setHost(saveBytes(data, p)); }
 
     action mark_close {
         request.setKeepAlive(false);
@@ -120,8 +121,9 @@ class HttpParser {
     // has been set
     private int markStart;
 
-    // Partially built marked strings
-    StringBuilder markedString;
+    // Partially built byte array
+    // TODO: see if this could be better done as a reusable ByteBuffer
+    byte[] marked;
 
     /**
      * Reset the parser and associate it with the given HttpRequest
@@ -129,33 +131,28 @@ class HttpParser {
     public void reset(HttpRequest request) {
         this.request = request;
         this.markStart = -1;
-        this.markedString = new StringBuilder();
+        this.marked = new byte[0];
 
         // --- Generated code ---
         %%write init;
     }
 
-    // Extract a string starting at markStart
-    private String extractString(byte[] data, int to) throws UnsupportedEncodingException {
-        if (markStart == -1) return "";
-        return new String(data, markStart, to - markStart, "ISO-8859-1");
-    }
 
-    // Save a marked string for the next round of parsing
+    // Save a marked byte array for the next round of parsing
     private void saveMark(byte[] data, int to) throws UnsupportedEncodingException {
         if (markStart >= 0) {
-            markedString.append(extractString(data, to));
+            int existingLength = marked.length;
+            int extraLength = to - markStart;
+            marked = Arrays.copyOf(marked, existingLength + extraLength);
+            System.arraycopy(data, markStart, marked, existingLength, extraLength);
             markStart = 0;
         }
     }
 
-    // Save a marked string for external use
-    private String saveString(byte[] data, int to) throws UnsupportedEncodingException {
-        markedString.append(extractString(data, to));
-        String ret = markedString.toString();
-        markedString.delete(0, markedString.length());
+    private byte[] saveBytes(byte[] data, int to) throws UnsupportedEncodingException {
+	saveMark(data, to);
         markStart = -1;
-        return ret;
+        return marked;
     }
 
     /**

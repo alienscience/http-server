@@ -5,12 +5,13 @@ package uk.org.alienscience;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 class HttpParser {
 
     //------------ Start of generated code ------------------------------------
 
-// line 14 "HttpParser.java"
+// line 15 "HttpParser.java"
 private static byte[] init__http_request_actions_0()
 {
 	return new byte [] {
@@ -397,7 +398,7 @@ static final int http_request_error = 0;
 static final int http_request_en_http_request = 1;
 
 
-// line 110 "HttpParser.rl"
+// line 111 "HttpParser.rl"
 
 
     //------------ End of generated code --------------------------------------
@@ -411,8 +412,9 @@ static final int http_request_en_http_request = 1;
     // has been set
     private int markStart;
 
-    // Partially built marked strings
-    StringBuilder markedString;
+    // Partially built byte array
+    // TODO: see if this could be better done as a reusable ByteBuffer
+    byte[] marked;
 
     /**
      * Reset the parser and associate it with the given HttpRequest
@@ -420,39 +422,34 @@ static final int http_request_en_http_request = 1;
     public void reset(HttpRequest request) {
         this.request = request;
         this.markStart = -1;
-        this.markedString = new StringBuilder();
+        this.marked = new byte[0];
 
         // --- Generated code ---
         
-// line 428 "HttpParser.java"
+// line 430 "HttpParser.java"
 	{
 	cs = http_request_start;
 	}
 
-// line 136 "HttpParser.rl"
+// line 138 "HttpParser.rl"
     }
 
-    // Extract a string starting at markStart
-    private String extractString(byte[] data, int to) throws UnsupportedEncodingException {
-        if (markStart == -1) return "";
-        return new String(data, markStart, to - markStart, "ISO-8859-1");
-    }
 
-    // Save a marked string for the next round of parsing
+    // Save a marked byte array for the next round of parsing
     private void saveMark(byte[] data, int to) throws UnsupportedEncodingException {
         if (markStart >= 0) {
-            markedString.append(extractString(data, to));
+            int existingLength = marked.length;
+            int extraLength = to - markStart;
+            marked = Arrays.copyOf(marked, existingLength + extraLength);
+            System.arraycopy(data, markStart, marked, existingLength, extraLength);
             markStart = 0;
         }
     }
 
-    // Save a marked string for external use
-    private String saveString(byte[] data, int to) throws UnsupportedEncodingException {
-        markedString.append(extractString(data, to));
-        String ret = markedString.toString();
-        markedString.delete(0, markedString.length());
+    private byte[] saveBytes(byte[] data, int to) throws UnsupportedEncodingException {
+	saveMark(data, to);
         markStart = -1;
-        return ret;
+        return marked;
     }
 
     /**
@@ -481,7 +478,7 @@ static final int http_request_en_http_request = 1;
         //--- Start of generated code ---
         
         
-// line 485 "HttpParser.java"
+// line 482 "HttpParser.java"
 	{
 	int _klen;
 	int _trans = 0;
@@ -562,87 +559,87 @@ case 1:
 			switch ( _http_request_actions[_acts++] )
 			{
 	case 0:
-// line 16 "HttpParser.rl"
+// line 17 "HttpParser.rl"
 	{
         request.setMethod(HttpRequest.Method.GET);
     }
 	break;
 	case 1:
-// line 20 "HttpParser.rl"
+// line 21 "HttpParser.rl"
 	{ 
         request.setMethod(HttpRequest.Method.PUT);
     }
 	break;
 	case 2:
-// line 24 "HttpParser.rl"
+// line 25 "HttpParser.rl"
 	{ 
         request.setMethod(HttpRequest.Method.POST);
     }
 	break;
 	case 3:
-// line 28 "HttpParser.rl"
+// line 29 "HttpParser.rl"
 	{ 
         request.setMethod(HttpRequest.Method.HEAD);
     }
 	break;
 	case 4:
-// line 32 "HttpParser.rl"
+// line 33 "HttpParser.rl"
 	{ 
         request.setMethod(HttpRequest.Method.DELETE);
     }
 	break;
 	case 5:
-// line 36 "HttpParser.rl"
+// line 37 "HttpParser.rl"
 	{
         ret = ParseState.METHOD_IS_UNSUPPORTED;
         { p += 1; _goto_targ = 5; if (true)  continue _goto;}
     }
 	break;
 	case 6:
-// line 49 "HttpParser.rl"
+// line 50 "HttpParser.rl"
 	{ 
         markStart = p;
     }
 	break;
 	case 7:
-// line 53 "HttpParser.rl"
+// line 54 "HttpParser.rl"
 	{ 
-        request.setPath(saveString(data, p));
+        request.setPath(saveBytes(data, p));
     }
 	break;
 	case 8:
-// line 75 "HttpParser.rl"
+// line 76 "HttpParser.rl"
 	{ 
         request.setHttpVersion(HttpVersion.HTTP_1_0);
     }
 	break;
 	case 9:
-// line 78 "HttpParser.rl"
+// line 79 "HttpParser.rl"
 	{ 
         request.setHttpVersion(HttpVersion.HTTP_1_1);
     }
 	break;
 	case 10:
-// line 85 "HttpParser.rl"
+// line 86 "HttpParser.rl"
 	{ markStart = p; }
 	break;
 	case 11:
-// line 86 "HttpParser.rl"
-	{ request.setHost(saveString(data, p)); }
+// line 87 "HttpParser.rl"
+	{ request.setHost(saveBytes(data, p)); }
 	break;
 	case 12:
-// line 88 "HttpParser.rl"
+// line 89 "HttpParser.rl"
 	{
         request.setKeepAlive(false);
     }
 	break;
 	case 13:
-// line 92 "HttpParser.rl"
+// line 93 "HttpParser.rl"
 	{
         request.setKeepAlive(true);
     }
 	break;
-// line 646 "HttpParser.java"
+// line 643 "HttpParser.java"
 			}
 		}
 	}
@@ -664,13 +661,13 @@ case 4:
 	while ( __nacts-- > 0 ) {
 		switch ( _http_request_actions[__acts++] ) {
 	case 5:
-// line 36 "HttpParser.rl"
+// line 37 "HttpParser.rl"
 	{
         ret = ParseState.METHOD_IS_UNSUPPORTED;
         { p += 1; _goto_targ = 5; if (true)  continue _goto;}
     }
 	break;
-// line 674 "HttpParser.java"
+// line 671 "HttpParser.java"
 		}
 	}
 	}
@@ -680,21 +677,21 @@ case 5:
 	break; }
 	}
 
-// line 187 "HttpParser.rl"
+// line 184 "HttpParser.rl"
 
         if (cs == 
-// line 687 "HttpParser.java"
+// line 684 "HttpParser.java"
 0
-// line 188 "HttpParser.rl"
+// line 185 "HttpParser.rl"
  ) {
             System.err.println("Failed to parse p=" + p);
             return ParseState.ERROR;
         }
 
         if (cs < 
-// line 696 "HttpParser.java"
+// line 693 "HttpParser.java"
 168
-// line 193 "HttpParser.rl"
+// line 190 "HttpParser.rl"
  ) {
             // Get the buffer ready for writing
             saveMark(data, p);

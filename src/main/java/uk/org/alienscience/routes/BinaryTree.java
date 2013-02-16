@@ -21,9 +21,9 @@ public class BinaryTree implements HttpRoutes {
         return null;
     }
 
-	@Override
-	public void add(String url, SocketEventHandler handler) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void add(String url, SocketEventHandler handler) {
+        // TODO implement
+	
+    }
 }

@@ -46,7 +46,6 @@ class HttpHeader {
              byte[] contentType,
              int contentLength ) throws IOException {
     	// TODO: output chunked if content length == -1
-    	// TODO: date header
         byte[] contentLengthBytes = convertToBytes(String.valueOf(contentLength));
         channel.put(httpVersion.toBytes()).put(SPACE);
         channel.put(httpStatus.code).put(SPACE);

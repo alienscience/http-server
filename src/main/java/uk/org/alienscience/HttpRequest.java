@@ -1,24 +1,38 @@
 package uk.org.alienscience;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Information obtained from HTTP headers
  */
 public class HttpRequest {
-	enum Method {
-		GET, PUT, POST, HEAD, DELETE;
-	}
+    enum Method {
+        GET, PUT, POST, HEAD, DELETE;
+    }
 
     private HttpVersion httpVersion;
-	private boolean keepAlive;
-	private Method method;
-	private String host;
-    private String path;
+    private boolean keepAlive;
+    private Method method;
+    private byte[] host;
+    private byte[] path;
+    private Map<String,byte[]> pathParameters;
 
-    public String getPath() {
+    public HttpRequest() {
+        pathParameters = new HashMap<String,byte[]>();
+    }
+    
+    public void reuse() {
+        keepAlive = true;
+        pathParameters.clear();
+    }
+    
+    public byte[] getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(byte[] path) {
         this.path = path;
     }
 
@@ -46,12 +60,22 @@ public class HttpRequest {
         this.method = method;
     }
 
-    public String getHost() {
+    public byte[] getHost() {
         return host;
     }
 
-    public void setHost(String host) {
+    public void setHost(byte[] host) {
         this.host = host;
+    }
+
+    /**
+     * Set a parameter obtained from the path
+     * @param name The name of the parameter
+     * @param start The start index in the path
+     * @param end The end index (not inclusive) in the path
+     */
+    public void setPathParameter(String name, int start, int end) {
+        pathParameters.put(name, Arrays.copyOfRange(path, start, end));
     }
 
 }

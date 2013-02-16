@@ -9,7 +9,7 @@ public class Stub implements HttpRoutes {
     private HttpHandler httpHandler;
     
     // TODO: non-blocking handlers
-	private SocketEventHandler socketEventHandler;
+    private SocketEventHandler socketEventHandler;
 
     @Override
     public void add(String url, HttpHandler handler) {
@@ -24,9 +24,9 @@ public class Stub implements HttpRoutes {
     @Override
     public RouteLookup lookup(HttpRequest httpRequest) {
         if (httpHandler == null) {
-            return new RouteLookup();
+            return RouteLookup.notFound();
         }
 
-        return new RouteLookup(httpHandler);
+        return RouteLookup.found(httpHandler);
     }
 }

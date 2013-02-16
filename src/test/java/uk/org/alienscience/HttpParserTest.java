@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test of the HTTP Parser
@@ -33,8 +34,9 @@ public class HttpParserTest {
         HttpParser parser = new HttpParser();
         parser.reset(request);
         assertSuccessfulParse(parser, data);
-        assertEquals(path, request.getPath());
+        assertTrue(Arrays.equals(path.getBytes(), request.getPath()));
     }
+
 
     // Parse data in chunks
     public void assertSuccessfulParseInChunks(byte[] wholeData, int bufferSize, String path)
