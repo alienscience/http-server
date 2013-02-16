@@ -32,7 +32,6 @@ public class RouteLookup {
      * @param response The response to send back to the caller
      */
     public void handle(HttpRequest request, HttpResponse response) throws IOException {
-        // TODO: If blocking, setup request/response and call handler
         // TODO: If non-blocking, send to non-blocking thread
 
         switch (request.getMethod()) {

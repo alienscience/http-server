@@ -63,7 +63,9 @@ public class HttpResponse {
     }
 
     public void body(String s) throws IOException {
-        write(s.getBytes(charset));
+    	byte[] data = s.getBytes(charset);
+    	setContentLength(data.length);
+        write(data);
     }
 
     public void setStatus(HttpStatus status) {

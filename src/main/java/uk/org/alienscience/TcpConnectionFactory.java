@@ -3,7 +3,7 @@ package uk.org.alienscience;
 import java.nio.channels.SocketChannel;
 
 /**
- * TODO: Document
+ * Creates TcpConnection objects
  */
 public interface TcpConnectionFactory {
     /**

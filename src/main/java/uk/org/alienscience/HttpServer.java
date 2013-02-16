@@ -4,6 +4,8 @@ import uk.org.alienscience.routes.Stub;
 import uk.org.alienscience.threadpool.ThreadPool;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A HTTP Server
@@ -59,7 +61,11 @@ public class HttpServer {
      * Start a HttpServer
      */
     public void start() throws IOException {
-       server.start();
+        // Start a timer to update header dates
+        startHeaderDateTimer();
+        
+        // Start the server
+        server.start();
     }
 
     /**
@@ -74,5 +80,20 @@ public class HttpServer {
      */
     public void route(String url, SocketEventHandler handler) {
         routes.add(url, handler);
+    }
+    
+    // Start a timer to update header dates
+    private static void startHeaderDateTimer() {
+       // Initialise the header date
+       HttpHeader.updateDate();
+       
+       // Update the header date every 500ms
+       Timer timer = new Timer();
+       timer.scheduleAtFixedRate(new TimerTask() {
+           @Override
+           public void run() {
+               HttpHeader.updateDate();
+           }
+       }, 500, 500);
     }
 }

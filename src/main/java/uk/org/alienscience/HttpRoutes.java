@@ -1,7 +1,7 @@
 package uk.org.alienscience;
 
 /**
- * TODO: Document
+ * Route URLs to HTTP handlers
  */
 public interface HttpRoutes {
 

@@ -3,14 +3,12 @@ package uk.org.alienscience;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 
 /**
  * A runnable object that handles a single HttpConnection
  */
 public class HttpConnection implements Runnable {
     // TODO: make the buffer size configurable
-	// TODO: use same buffer for input and output
     private static final int BUFFER_SIZE_BYTES = 16384;
 
     private final SocketChannel channel;
