@@ -15,8 +15,14 @@
                 `--- {name} -- woot
                             `- * 
 
-Algorithm:
+Search Algorithm:
   - Split path on /
   - Check specific path (use hash table)
   - Check file patterns (order not specified)
   - Check captured 
+
+Insert Algorithm
+  - Spit path on /
+  - Foreach component of the path
+     - If component exists insert into existing
+     - If component does not exist, insert new
