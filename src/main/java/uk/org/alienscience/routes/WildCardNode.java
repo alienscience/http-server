@@ -1,5 +1,6 @@
 package uk.org.alienscience.routes;
 
+import uk.org.alienscience.HttpHandler;
 import uk.org.alienscience.HttpRequest;
 
 /**
@@ -7,20 +8,20 @@ import uk.org.alienscience.HttpRequest;
  */
 class WildCardNode implements Node {
 
-    private final DecisionTree tree;
-   
-    WildCardNode(DecisionTree tree) {
-        this.tree = tree;
+    private final HttpHandler handler;
+
+    WildCardNode(HttpHandler handler) {
+        this.handler = handler;
     }
     
     @Override
-    public boolean matches(HttpRequest request, int start, int end) {
-        return true;
+    public HttpHandler lookup(HttpRequest request, byte[] path, int start, int end) {
+       return handler;
     }
 
     @Override
-    public DecisionTree getTree() {
-        return tree;
+    public boolean insert(byte[] path, int start, int end, HttpHandler handler) {
+        // No new nodes can be added to this object
+        return false;
     }
-
 }

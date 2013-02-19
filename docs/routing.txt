@@ -7,13 +7,14 @@
                     than /path/* but less specific than /path/subpath/*
 /path/{name}/woot - More specific than /path/{name}/*
 
-           branches containing nodes
+==== Branches containing nodes
 
    root -- single
         `- path ---- subpath -- *
                 `--- *.txt
                 `--- {name} -- woot
                             `- * 
+
 
 Search Algorithm:
   - Split path on /
@@ -22,7 +23,26 @@ Search Algorithm:
   - Check captured 
 
 Insert Algorithm
-  - Spit path on /
+  - Split path on /
   - Foreach component of the path
      - If component exists insert into existing
      - If component does not exist, insert new
+
+
+==== Nodes that link to each other
+
+   /single -- /path -- null
+     `-- Handler  `-- subpath -- *.txt -- {name} -- null
+                       |           |        `-- woot -- Handler
+                       |           `-- Handler   `-- Handler
+                       `-- Handler
+
+ Search algorithm
+    - Split path on /
+    - Try first node, if match follow match link
+    - If not match follow not match link
+
+ Insert algorithm
+    - Split path on /
+    - Try first node, if match insert into node
+    - If not match insert into not match link

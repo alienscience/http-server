@@ -1,17 +1,12 @@
 package uk.org.alienscience.routes;
 
+import uk.org.alienscience.*;
+
+import javax.annotation.concurrent.ThreadSafe;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import uk.org.alienscience.HttpHandler;
-import uk.org.alienscience.HttpRequest;
-import uk.org.alienscience.HttpRoutes;
-import uk.org.alienscience.RouteLookup;
-import uk.org.alienscience.SocketEventHandler;
 
 /**
  * Routing based on a decision tree
@@ -67,7 +62,6 @@ public class DecisionTree implements HttpRoutes {
         return lookup(httpRequest, path, start, end);
     }
  
-    // TODO: see if the node classes can do this themselves
     private void createNode(byte[] path, int start, HttpHandler handler) {
         int end = findNextSeparator(path, start);
         
@@ -95,6 +89,7 @@ public class DecisionTree implements HttpRoutes {
             }
             // TODO this is unfinished, a new tree does not have to be created each time
             String name = new String(path, start +1, end -1, charset);
+            Node node = new CaptureNode(name,)
             DecisionTree tree = new DecisionTree();
             int nextStart = findNextStart(path, end);
             tree.createNode(path, nextStart, handler);
@@ -133,7 +128,7 @@ public class DecisionTree implements HttpRoutes {
     }
     
     // Lookup a route using part of a path
-    private RouteLookup lookup(HttpRequest httpRequest, byte[] path, int start, int end) {
+    RouteLookup lookup(HttpRequest httpRequest, byte[] path, int start, int end) {
         
         // Is this a leaf?
         if (leaf != null) {
@@ -147,6 +142,10 @@ public class DecisionTree implements HttpRoutes {
         
         // Loop through the nodes in this branch
         for (Node node : branch) {
+            HttpHandler handler = node.lookup(httpRequest, start, end);
+            if (handler != null) {
+                return RouteLookup.found(handler);
+            }
             if (node.matches(httpRequest, start, end)) {
                 int nextStart = findNextStart(path, end);
                 int nextEnd = findNextSeparator(path, nextStart);

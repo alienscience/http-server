@@ -1,20 +1,27 @@
 package uk.org.alienscience.routes;
 
+import uk.org.alienscience.HttpHandler;
 import uk.org.alienscience.HttpRequest;
 
-public interface Node {
+import javax.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
+interface Node {
 
     /**
-     * Indicates if the given node matches part of a path
-     * @param request  The path to match against
+     * Finds the handler matching part of a path
+     * @param request  The request containing the path to match against
+     * @param path The path to match against
      * @param start The start index of the part to match against
      * @param end The end index + 1 of the part to match against
-     * @return True if the node matches the path, false otherwise
+     * @return The matching handler if one exists, null otherwise
      */
-    public boolean matches(HttpRequest request, int start, int end);
-   
+    HttpHandler lookup(HttpRequest request, byte[] path, int start, int end);
+
     /**
-     * Get the tree contained by this node
+     * Insert a lookup into this node
+     * @return true if the lookup could be inserted, false if not
      */
-    public DecisionTree getTree();
+    boolean insert(byte[] path, int start, int end, HttpHandler handler);
+
 }
