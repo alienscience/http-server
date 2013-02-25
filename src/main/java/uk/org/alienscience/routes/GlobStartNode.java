@@ -6,6 +6,7 @@ import uk.org.alienscience.HttpRequest;
 import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Matches glob patterns that start with '*' e.g *.html
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class GlobStartNode implements Node {
 
     private final ConcurrentHashMap<ByteBuffer,HttpHandler> handlers;
+    private AtomicReference<Node> next;
 
     GlobStartNode() {
         handlers = new ConcurrentHashMap<>();
@@ -21,20 +23,23 @@ class GlobStartNode implements Node {
     @Override
     public HttpHandler lookup(HttpRequest request, byte[] path, int start, int end) {
         Enumeration<ByteBuffer> keys = handlers.keys();
-
-        // TODO see if this should match the whole path or just part of it
+        
+        // Match the whole path
+        int from = path.length - 1;
+        
+        // Loop through the globs
         while (keys.hasMoreElements()) {
             ByteBuffer buffer = keys.nextElement();
             byte[] literal = buffer.array();
 
             // Match the literal from the end to the start
-            int i;
-            for (i = end -1; i >= start; i--) {
-                int j = i - start;
-                if (j < 0) break;
+            int i, j;
+            for (i = from, j = literal.length; 
+                    i >= start && j >= 0; 
+                    i--, j--) {
                 if (path[i] != literal[j]) break;
             }
-            if (i < start) {
+            if (j < 0) {
                 return handlers.get(buffer);
             }
         }
@@ -44,6 +49,9 @@ class GlobStartNode implements Node {
 
     @Override
     public boolean insert(byte[] path, int start, int end, HttpHandler handler) {
-        // TODO get literal and add to handlers map
+        // Is this a glob in the form *.ext or *ext 
+        if (path[start] != 0x2a || end - start < 2 ) {
+            return NodeWalk.insert(next, path, start, end, handler);
+        }
     }
 }

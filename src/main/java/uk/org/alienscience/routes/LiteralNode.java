@@ -53,6 +53,8 @@ class LiteralNode implements Node {
                 return true;
             }
         } else {
+            // TODO put this logic into Nodewalk and call:
+            //      NodeWalk.insert(next, path, start, end, handler)
             if (next.get() == null) {
                 Node newNode = NodeWalk.create(path, start, end, handler);
                 if (next.compareAndSet(null, newNode)) {
