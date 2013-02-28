@@ -19,7 +19,15 @@ class GlobStartNode implements Node {
     GlobStartNode() {
         handlers = new ConcurrentHashMap<>();
     }
-    
+
+    /**
+     *  Does the given section of path look like a glob start node?
+     */
+    static boolean isGlobStart(byte[] path, int start, int end) {
+        // Is this a glob in the form *.ext or *ext
+        return (path[start] == 0x2a && end - start > 2 );
+    }
+
     @Override
     public HttpHandler lookup(HttpRequest request, byte[] path, int start, int end) {
         Enumeration<ByteBuffer> keys = handlers.keys();
@@ -50,7 +58,7 @@ class GlobStartNode implements Node {
     @Override
     public boolean insert(byte[] path, int start, int end, HttpHandler handler) {
         // Is this a glob in the form *.ext or *ext 
-        if (path[start] != 0x2a || end - start < 2 ) {
+        if (!isGlobStart(path, start, end)) {
             return NodeWalk.insert(next, path, start, end, handler);
         }
     }
