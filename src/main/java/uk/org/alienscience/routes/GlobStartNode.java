@@ -61,5 +61,10 @@ class GlobStartNode implements Node {
         if (!isGlobStart(path, start, end)) {
             return NodeWalk.insert(next, path, start, end, handler);
         }
+        
+        // Insert into the current node
+        ByteBuffer key = ByteBuffer.wrap(path, start+1, end - start - 1);
+        handlers.put(key, handler);
+        return true;
     }
 }

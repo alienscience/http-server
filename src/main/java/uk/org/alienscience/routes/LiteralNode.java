@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * A node that matches a literal sequence of bytes
  */
-@ThreadSafe
+//@ThreadSafe
 class LiteralNode implements Node {
 
     private final ConcurrentHashMap<ByteBuffer, Node> nodes;

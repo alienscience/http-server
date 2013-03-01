@@ -46,3 +46,9 @@ Insert Algorithm
     - Split path on /
     - Try first node, if match insert into node
     - If not match insert into not match link
+
+ Advantages
+    - Nodes can be optimised e.g LiteralNode is a hierachical hash table
+ Problems
+    - Insert/lookup algorithm is spread over many node types
+
