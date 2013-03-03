@@ -25,13 +25,14 @@ public class DecisionTree implements HttpRoutes {
    
     
     @Override
-    public void add(String url, HttpHandler handler) {
+    public void add(String url, HttpHandler handler) throws RoutingException {
         // TODO handle URL encoding
         byte[] path = url.getBytes(charset);
         
         // Find the first non / character
         int start = NodeWalk.nextNonSeparator(path, 0);
-   
+        if (start == -1) throw new RoutingException("Not a valid path pattern:" + url);
+        
         // Find the next / character
         int end = NodeWalk.nextEnd(path, start);
     
@@ -50,9 +51,15 @@ public class DecisionTree implements HttpRoutes {
         
         // Find the first non / character
         int start = NodeWalk.nextNonSeparator(path, 0);
-        
-        // Find the next / character
-        int end = NodeWalk.nextEnd(path, start);
+        int end;
+        if (start == -1) {
+            // Empty path lookup
+            start = 0;
+            end = 0;
+        } else {
+            // Find the next / character
+            end = NodeWalk.nextEnd(path, start);
+        }
         
         // Lookup
         HttpHandler handler = NodeWalk.lookup(root, httpRequest, path, start, end);

@@ -1,5 +1,7 @@
 package uk.org.alienscience;
 
+import uk.org.alienscience.routes.RoutingException;
+
 /**
  * Route URLs to HTTP handlers
  */
@@ -9,8 +11,9 @@ public interface HttpRoutes {
      * Add a route that is handled through a blocking API.
      * @param url The path or URL of the route.
      * @param handler A handler to handle the route.
+     * @throws RoutingException 
      */
-    public void add(String url, HttpHandler handler);
+    public void add(String url, HttpHandler handler) throws RoutingException;
 
     /**
      * Add a route that is handled through a non-blocking API.

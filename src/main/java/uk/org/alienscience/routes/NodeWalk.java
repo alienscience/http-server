@@ -32,20 +32,8 @@ public class NodeWalk {
                 return true;
             }
         }
-        return insert(nodeRef.get(), pattern, start, end, handler);
-    }
-
-    /**
-     * Insert a handler into the given node to handle the given path pattern
-     * @param node The node to insert into
-     * @param pattern The path pattern
-     * @param start The start point
-     * @param end The end point
-     * @param handler The handler to insert
-     * @return True if the handler could be inserted, false if not
-     */
-    public static boolean insert(Node node, byte[] pattern, int start, int end, HttpHandler handler) {
-        return node.insert(pattern, start, end, handler);
+        
+        return nodeRef.get().insert(pattern, start, end, handler);
     }
 
     /**
@@ -84,7 +72,7 @@ public class NodeWalk {
                                            int end) {
 
         // Consider the next part of the path
-        int newStart = end;
+        int newStart = end + 1;
         int newEnd = nextEnd(path, end);
 
         // See if we have reached the end of the path
@@ -104,6 +92,10 @@ public class NodeWalk {
     public static Node create(byte[] pattern, int start, int end, HttpHandler handler) {
         if (GlobStartNode.isGlobStart(pattern, start, end)) {
             return new GlobStartNode();
+        } else if (CaptureNode.isCapture(pattern, start, end)) {
+            return new CaptureNode();
+        } else if (WildCardNode.isWildCard(pattern, start, end)) {
+            return new WildCardNode(handler);
         } else {
             return new LiteralNode();
         }
@@ -171,10 +163,11 @@ public class NodeWalk {
     
     /**
      * Calculate the next end point in the given path pattern
+     * @return The next end point
      */
     public static int nextEnd(byte[] pattern, int end) {
         // Calculate new start and end points by counting up to the next '/'
-        int newStart = end;
+        int newStart = end + 1;
         int i;
         for (i = newStart; i < pattern.length; i++) {
             if (pattern[i] == 0x2f) break;

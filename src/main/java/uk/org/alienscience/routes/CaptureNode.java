@@ -20,7 +20,7 @@ class CaptureNode implements Node {
     /**
      *  Does the given section of path look like a capture?
      */
-    private static boolean isCapture(byte[] path, int start, int end) {
+    static boolean isCapture(byte[] path, int start, int end) {
         if (path[start] == 0xb7 && path[end -1] == 0xd7) {
             return true;
         }
