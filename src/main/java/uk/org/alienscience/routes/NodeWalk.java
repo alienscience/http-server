@@ -85,7 +85,7 @@ public class NodeWalk {
 
         // Consider the next part of the path
         int newStart = end;
-        int newEnd = nextEnd(path, start, end);
+        int newEnd = nextEnd(path, end);
 
         // See if we have reached the end of the path
         if (newStart == newEnd) return null;
@@ -120,7 +120,7 @@ public class NodeWalk {
     public static Node createBranch(byte[] pattern, int start, int end, HttpHandler handler) {
         // Consider the next part of the path pattern
         int newStart = end;
-        int newEnd = nextEnd(pattern, start, end);
+        int newEnd = nextEnd(pattern, end);
 
         // Check to see if the entire path pattern has been inserted
         if (newStart == newEnd) return null;
@@ -145,7 +145,7 @@ public class NodeWalk {
 
         // Consider the next part of the path pattern
         int newStart = end;
-        int newEnd = nextEnd(pattern, start, end);
+        int newEnd = nextEnd(pattern, end);
 
         // Check to see if the entire path pattern has been inserted
         if (newStart == newEnd) return true;
@@ -155,9 +155,24 @@ public class NodeWalk {
     }
 
     /**
+     * Find the next non-separator value in the given path pattern
+     * @param pattern The path pattern to search
+     * @param start The starting point of the search
+     * @return The index to the next non-separator value or -1 if not found
+     */
+    public static int nextNonSeparator(byte[] pattern, int start) {
+        for (int i = start; i < pattern.length; i++) {
+           if (pattern[i] != 0x2f) {
+               return i;
+           }
+        }
+        return -1;
+    }
+    
+    /**
      * Calculate the next end point in the given path pattern
      */
-    private static int nextEnd(byte[] pattern, int start, int end) {
+    public static int nextEnd(byte[] pattern, int end) {
         // Calculate new start and end points by counting up to the next '/'
         int newStart = end;
         int i;

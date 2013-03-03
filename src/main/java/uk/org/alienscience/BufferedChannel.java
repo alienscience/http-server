@@ -1,9 +1,10 @@
 package uk.org.alienscience;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Combines a ByteBuffer with a SocketChannel to provide blocking buffered writes

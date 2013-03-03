@@ -1,9 +1,8 @@
 package uk.org.alienscience.routes;
 
+import net.jcip.annotations.ThreadSafe;
 import uk.org.alienscience.HttpHandler;
 import uk.org.alienscience.HttpRequest;
-
-import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
 interface Node {
