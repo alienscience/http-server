@@ -1,11 +1,10 @@
 package uk.org.alienscience.routes;
 
+import net.jcip.annotations.ThreadSafe;
 import uk.org.alienscience.*;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicReference;
-
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Routing based on a decision tree
@@ -25,13 +24,13 @@ public class DecisionTree implements HttpRoutes {
    
     
     @Override
-    public void add(String url, HttpHandler handler) throws RoutingException {
+    public void add(String pattern, HttpHandler handler) {
         // TODO handle URL encoding
-        byte[] path = url.getBytes(charset);
+        byte[] path = pattern.getBytes(charset);
         
         // Find the first non / character
         int start = NodeWalk.nextNonSeparator(path, 0);
-        if (start == -1) throw new RoutingException("Not a valid path pattern:" + url);
+        if (start == -1) throw new IllegalArgumentException("Not a valid path pattern:" + pattern);
         
         // Find the next / character
         int end = NodeWalk.nextEnd(path, start);
@@ -41,7 +40,7 @@ public class DecisionTree implements HttpRoutes {
     }
 
     @Override
-    public void add(String url, SocketEventHandler handler) {
+    public void add(String pattern, SocketEventHandler handler) {
         // TODO implement
     }
     

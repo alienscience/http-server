@@ -1,26 +1,25 @@
 package uk.org.alienscience;
 
-import uk.org.alienscience.routes.RoutingException;
-
 /**
- * Route URLs to HTTP handlers
+ * Route URLs to HTTP handlers.
+ * TODO: path pattern examples
  */
 public interface HttpRoutes {
 
     /**
      * Add a route that is handled through a blocking API.
-     * @param url The path or URL of the route.
+     * @param pattern A path pattern.
      * @param handler A handler to handle the route.
-     * @throws RoutingException 
+     * @throws IllegalArgumentException if the url is invalid
      */
-    public void add(String url, HttpHandler handler) throws RoutingException;
+    public void add(String pattern, HttpHandler handler);
 
     /**
      * Add a route that is handled through a non-blocking API.
-     * @param url The path or URL of the route.
+     * @param pattern A path pattern.
      * @param handler A handler to handle the route.
      */
-    public void add(String url, SocketEventHandler handler);
+    public void add(String pattern, SocketEventHandler handler);
 
     /**
      * Lookup a HttpHandler for the given request.
